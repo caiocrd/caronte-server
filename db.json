@@ -1,0 +1,100 @@
+{
+  "embarcacao": [
+    {
+        "id":"1",
+        "nome": "Veleiro Valente",
+        "proprietario":{
+            "id": 1,
+            "nome": "Caio Cesar" 
+        },
+        "descricao":"Veleiro de 10 m² com capacidade para 10 pessoas. Usado principalmente para lazer. Possui diversas marcaas de uso",
+        "imagem":"https://dummyimage.com/600x400/000/fff.jpg",
+        "movimentacoes":[
+            {
+                "id":"1",
+                "tipo":"Entrada",
+                "data":"07/07/2019 08:05:00"
+            },
+            {
+                "id":"2",
+                "tipo":"Saida",
+                "data":"15/07/2019 07:00:00"
+            },
+            {
+                "id":"3",
+                "tipo":"Entrada",
+                "data":"15/07/2019 17:00:00"
+            }
+        ]
+    },
+    {
+        "id":"2",
+        "nome": "Lancha pequena",
+        "proprietario":{ 
+            "id": 2,
+            "nome": "Daniel Olinto" 
+        },
+        "descricao":"Pequena lancha de uso pessoal, uasa principalmente para pesca. capacidade para 3 pessoas",
+        "imagem":"https://dummyimage.com/600x400/000/fff.jpg",
+        "movimentacoes":[
+            {
+                "id":"4",
+                "tipo":"Entrada",
+                "data":"04/07/2019 04:00:00"
+            }
+        ]
+        
+    },
+    {
+        "id":"3",
+        "nome": "Jangada Grande",
+        "proprietario":{ 
+            "id": 3, 
+            "nome": "David Montalvao"
+        },
+        "descricao":"Jangada de 20 m² com capacidade para 40 pessoas. Complatamente nova. Possibilidade de levar carros",
+        "imagem":"https://dummyimage.com/600x400/000/fff.jpg",
+        "movimentacoes":[
+            {
+                "id":"5",
+                "tipo":"Entrada",
+                "data":"01/05/2019 05:00:00"
+            },
+            {
+                "id":"6",
+                "tipo":"Saida",
+                "data":"10/05/2019 07:45:00"
+            },
+            {
+                "id":"7",
+                "tipo":"Entrada",
+                "data":"10/05/2019 12:46:00"
+            },
+            {
+                "id":"8",
+                "tipo":"Saida",
+                "data":"14/06/2019 09:25:00"
+            },
+            {
+                "id":"9",
+                "tipo":"Entrada",
+                "data":"15/06/2019 17:00:00"
+            }
+        ]
+    }
+  ],
+  "proprietario": [
+    {
+        "id": 1,
+        "nome": "Caio Cesar" 
+    },
+    { 
+        "id": 2,
+        "nome": "Daniel Olinto" 
+    },
+    { 
+        "id": 3, 
+        "nome": "David Montalvao"
+    }
+  ]
+}
