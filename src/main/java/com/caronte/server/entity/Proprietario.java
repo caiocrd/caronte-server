@@ -41,6 +41,12 @@ public class Proprietario {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
+	public List<Embarcacao> getEmbarcacoes() {
+		return embarcacoes;
+	}
+	public void setEmbarcacoes(List<Embarcacao> embarcacoes) {
+		this.embarcacoes = embarcacoes;
+	}
 	
 	
 	
