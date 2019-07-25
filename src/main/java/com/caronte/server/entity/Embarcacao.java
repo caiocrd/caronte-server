@@ -7,9 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
@@ -17,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class Embarcacao {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue	
 	private Long id;
 	
 	private String nome;

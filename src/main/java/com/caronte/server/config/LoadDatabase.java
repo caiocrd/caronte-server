@@ -1,4 +1,4 @@
-package com.caronte.server.repository;
+package com.caronte.server.config;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
