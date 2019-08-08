@@ -7,6 +7,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -20,7 +23,15 @@ public class Embarcacao {
 	
 	private String nome;
 	private String descricao;
-	private String imagem;
+	
+	@Transient
+	private MultipartFile imagem;
+	
+	@Transient
+	private MultipartFile documento;
+	
+	@Transient
+	private String proprietario_id;
 	
 	@ManyToOne
 	@JsonIgnoreProperties("embarcacoes")
@@ -66,11 +77,24 @@ public class Embarcacao {
 	public void setMovimentacoes(List<Movimentacao> movimentacoes) {
 		this.movimentacoes = movimentacoes;
 	}
-	public String getImagem() {
+	public MultipartFile getImagem() {
 		return imagem;
 	}
-	public void setImagem(String imagem) {
+	public void setImagem(MultipartFile imagem) {
 		this.imagem = imagem;
 	}
+	public MultipartFile getDocumento() {
+		return documento;
+	}
+	public void setDocumento(MultipartFile documento) {
+		this.documento = documento;
+	}
+	public String getProprietario_id() {
+		return proprietario_id;
+	}
+	public void setProprietario_id(String proprietario_id) {
+		this.proprietario_id = proprietario_id;
+	}
+	
 	
 }
