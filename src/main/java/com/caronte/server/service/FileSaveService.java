@@ -5,12 +5,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class FileSaveService {
-	private final String IMAGEM_DIR = "/Users/caiocesar/progerencial/imagem/";
+	
+	@Value("${file.upload-dir}")
+	private String IMAGEM_DIR;;
 	
 	public void save(MultipartFile file, String nome) throws IOException {
 		 if (file.isEmpty()) {

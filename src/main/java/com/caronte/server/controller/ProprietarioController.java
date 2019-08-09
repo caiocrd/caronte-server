@@ -9,6 +9,7 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +44,7 @@ public class ProprietarioController {
 	}
 	@CrossOrigin
 	@RequestMapping(value = "/proprietarios", method = RequestMethod.POST)
-	ResponseEntity<?> newProprieteario(@RequestBody Proprietario proprietario) {
+	ResponseEntity<?> newProprieteario(@ModelAttribute Proprietario proprietario) {
 		Proprietario nova = repository.save(proprietario);
 		 try {
 		        fileSaveService.save(nova.getDocumento(), nova.getId() + "_documento_proprietario");	
