@@ -47,6 +47,9 @@ public class Embarcacao {
 	public Embarcacao(String nome) {
 		this.nome = nome;
 	}
+	public Embarcacao(Long id) {
+		this.id = id;
+	}
 	public Long getId() {
 		return id;
 	}

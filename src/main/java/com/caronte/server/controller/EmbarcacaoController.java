@@ -1,6 +1,7 @@
 package com.caronte.server.controller;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.caronte.server.entity.Embarcacao;
+import com.caronte.server.entity.Movimentacao;
 import com.caronte.server.entity.Proprietario;
+import com.caronte.server.entity.TipoMovimentacao;
 import com.caronte.server.exception.EmbarcacaoNotFoundExceprion;
 import com.caronte.server.repository.EmbarcacaoRepository;
+import com.caronte.server.repository.MovimentacaoRepository;
 import com.caronte.server.service.FileSaveService;
 
 
@@ -30,12 +34,14 @@ import com.caronte.server.service.FileSaveService;
 public class EmbarcacaoController {
 
 	private final EmbarcacaoRepository repository;
+	private final MovimentacaoRepository movimentacaoRepository;
 
 	@Autowired
 	private FileSaveService fileSaveService;
 	
-	public EmbarcacaoController(EmbarcacaoRepository repository) {
+	public EmbarcacaoController(EmbarcacaoRepository repository, MovimentacaoRepository movimentacaoRepository) {
 		this.repository = repository;
+		this.movimentacaoRepository = movimentacaoRepository;
 	}
 	@CrossOrigin
 	@RequestMapping(value = "/embarcacoes", method = RequestMethod.GET)
@@ -64,6 +70,25 @@ public class EmbarcacaoController {
 		    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		    }
 		 return new ResponseEntity<>(HttpStatus.CREATED);
+
+	}
+	
+	@CrossOrigin
+	@RequestMapping(value = "/embarcacao/{id}/movimentacao", method = RequestMethod.POST)
+	Movimentacao newMovimentacao(@RequestBody String ocorrencia, @PathVariable Long id) {
+		
+		Embarcacao embarcacao = new Embarcacao(id);
+		Movimentacao last = movimentacaoRepository.findFirstByEmbarcacaoOrderByIdDesc(embarcacao);
+		Movimentacao movimentacao = new Movimentacao();
+		movimentacao.setOcorrencia(ocorrencia);
+		movimentacao.setEmbarcacao(embarcacao);
+		movimentacao.setData(Calendar.getInstance());
+		if(last == null || last.getTipo() == TipoMovimentacao.ENTRADA)
+			movimentacao.setTipo(TipoMovimentacao.SAIDA);
+		else
+			movimentacao.setTipo(TipoMovimentacao.ENTRADA);
+
+		return movimentacaoRepository.save(movimentacao);
 
 	}
 	

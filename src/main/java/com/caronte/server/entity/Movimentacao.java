@@ -9,6 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class Movimentacao {
 
@@ -24,6 +26,7 @@ public class Movimentacao {
 	private String ocorrencia;
 	
 	@ManyToOne
+	@JsonIgnore
 	private Embarcacao embarcacao;
 
 	public Long getId() {
@@ -56,6 +59,14 @@ public class Movimentacao {
 
 	public void setOcorrencia(String ocorrencia) {
 		this.ocorrencia = ocorrencia;
+	}
+
+	public Embarcacao getEmbarcacao() {
+		return embarcacao;
+	}
+
+	public void setEmbarcacao(Embarcacao embarcacao) {
+		this.embarcacao = embarcacao;
 	}
 	
 	
