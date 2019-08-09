@@ -1,15 +1,11 @@
 package com.caronte.server.controller;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -20,12 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.caronte.server.entity.Embarcacao;
 import com.caronte.server.entity.Proprietario;
 import com.caronte.server.exception.EmbarcacaoNotFoundExceprion;
 import com.caronte.server.repository.EmbarcacaoRepository;
+import com.caronte.server.service.FileSaveService;
 
 
 
@@ -33,11 +29,11 @@ import com.caronte.server.repository.EmbarcacaoRepository;
 @RestController	
 public class EmbarcacaoController {
 
-	
-	
-	private final String IMAGEM_DIR = "/home/users/caio.cesar/imagem/";
 	private final EmbarcacaoRepository repository;
 
+	@Autowired
+	private FileSaveService fileSaveService;
+	
 	public EmbarcacaoController(EmbarcacaoRepository repository) {
 		this.repository = repository;
 	}
@@ -53,7 +49,7 @@ public class EmbarcacaoController {
 	
 	@CrossOrigin
 	@RequestMapping(value = "/embarcacoes", method = RequestMethod.POST)
-	Embarcacao newEmbarcacao( @ModelAttribute Embarcacao emb) {
+	ResponseEntity<?> newEmbarcacao( @ModelAttribute Embarcacao emb) {
 		
 		//Salvar arquivos
 		Proprietario p = new Proprietario();
@@ -61,26 +57,15 @@ public class EmbarcacaoController {
 		emb.setProprietario(p);
 		Embarcacao nova = repository.save(emb);
 		 try {
-		        saveUploadedFiles(emb.getImagem(), nova.getId() + "_foto");	
-		        saveUploadedFiles(emb.getDocumento(), nova.getId() + "_documento");
+		        fileSaveService.save(emb.getImagem(), nova.getId() + "_foto");	
+		        fileSaveService.save(emb.getDocumento(), nova.getId() + "_documento");
 		    } catch (IOException e) {
 		    	System.out.println(e);
-		        return null;
+		    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		    }
-		return nova;
+		 return new ResponseEntity<>(HttpStatus.CREATED);
+
 	}
-	
-	
-	private void saveUploadedFiles(MultipartFile file, String sufixo) throws IOException {
-
-        if (file.isEmpty()) {
-            return; //next pls
-        }
-
-        byte[] bytes = file.getBytes();
-        Path path = Paths.get(IMAGEM_DIR + sufixo);
-        Files.write(path, bytes);
-    }
 	
 	@CrossOrigin
 	@RequestMapping(value = "/embarcacoes/{id}", method = RequestMethod.GET)

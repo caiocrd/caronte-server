@@ -7,6 +7,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.Data;
 
@@ -19,6 +22,12 @@ public class Proprietario {
 	private Long id;
 	
 	private String nome;
+	
+	@Transient
+	private MultipartFile habilitacao;
+	
+	@Transient
+	private MultipartFile documento;
 	
 	@OneToMany(mappedBy = "proprietario", cascade = CascadeType.ALL)
 	private List<Embarcacao> embarcacoes;
@@ -47,7 +56,17 @@ public class Proprietario {
 	public void setEmbarcacoes(List<Embarcacao> embarcacoes) {
 		this.embarcacoes = embarcacoes;
 	}
-	
-	
+	public MultipartFile getHabilitacao() {
+		return habilitacao;
+	}
+	public void setHabilitacao(MultipartFile habilitacao) {
+		this.habilitacao = habilitacao;
+	}
+	public MultipartFile getDocumento() {
+		return documento;
+	}
+	public void setDocumento(MultipartFile documento) {
+		this.documento = documento;
+	}
 	
 }

@@ -1,9 +1,13 @@
 package com.caronte.server.controller;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,11 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.caronte.server.entity.Proprietario;
 import com.caronte.server.exception.ProprietarioNotFoundExceprion;
 import com.caronte.server.repository.ProprietarioRepository;
+import com.caronte.server.service.FileSaveService;
 
 @RestController	
 public class ProprietarioController {
 
 	private final ProprietarioRepository repository;
+	
+	@Autowired
+	private FileSaveService fileSaveService;
 
 	public ProprietarioController(ProprietarioRepository repository) {
 		this.repository = repository;
@@ -35,8 +43,16 @@ public class ProprietarioController {
 	}
 	@CrossOrigin
 	@RequestMapping(value = "/proprietarios", method = RequestMethod.POST)
-	Proprietario newProprieteario(@RequestBody Proprietario proprietario) {
-		return repository.save(proprietario);
+	ResponseEntity<?> newProprieteario(@RequestBody Proprietario proprietario) {
+		Proprietario nova = repository.save(proprietario);
+		 try {
+		        fileSaveService.save(nova.getDocumento(), nova.getId() + "_documento_proprietario");	
+		        fileSaveService.save(nova.getHabilitacao(), nova.getId() + "_habilitacao");
+		    } catch (IOException e) {
+		    	System.out.println(e);
+		    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		    }
+		 return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 	@CrossOrigin
 	@RequestMapping(value = "/proprietarios/{id}", method = RequestMethod.GET)
