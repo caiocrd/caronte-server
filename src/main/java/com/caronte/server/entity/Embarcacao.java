@@ -24,6 +24,10 @@ public class Embarcacao {
 	private String nome;
 	private String descricao;
 	
+	private String caminhoImagem;
+	
+	private String caminhoDocumento;
+	
 	@Transient
 	private MultipartFile imagem;
 	
@@ -97,6 +101,18 @@ public class Embarcacao {
 	}
 	public void setProprietario_id(String proprietario_id) {
 		this.proprietario_id = proprietario_id;
+	}
+	public String getCaminhoImagem() {
+		return caminhoImagem;
+	}
+	public void setCaminhoImagem(String caminhoImagem) {
+		this.caminhoImagem = caminhoImagem;
+	}
+	public String getCaminhoDocumento() {
+		return caminhoDocumento;
+	}
+	public void setCaminhoDocumento(String caminhoDocumento) {
+		this.caminhoDocumento = caminhoDocumento;
 	}
 	
 	

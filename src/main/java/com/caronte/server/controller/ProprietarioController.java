@@ -3,6 +3,7 @@ package com.caronte.server.controller;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -46,9 +47,12 @@ public class ProprietarioController {
 	@RequestMapping(value = "/proprietarios", method = RequestMethod.POST)
 	ResponseEntity<?> newProprieteario(@ModelAttribute Proprietario proprietario) {
 		Proprietario nova = repository.save(proprietario);
+		proprietario.setCaminhoHabilitacao(nova.getId() + "_habilitacao." + FilenameUtils.getExtension(proprietario.getHabilitacao().getOriginalFilename()));;
+		proprietario.setCaminhoDocumento(nova.getId() + "_documento_proprietario." + FilenameUtils.getExtension(proprietario.getDocumento().getOriginalFilename()));;
 		 try {
-		        fileSaveService.save(nova.getDocumento(), nova.getId() + "_documento_proprietario");	
-		        fileSaveService.save(nova.getHabilitacao(), nova.getId() + "_habilitacao");
+		        fileSaveService.save(nova.getDocumento(), proprietario.getCaminhoDocumento());	
+		        fileSaveService.save(nova.getHabilitacao(), proprietario.getCaminhoHabilitacao());
+		        repository.save(proprietario);
 		    } catch (IOException e) {
 		    	System.out.println(e);
 		    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

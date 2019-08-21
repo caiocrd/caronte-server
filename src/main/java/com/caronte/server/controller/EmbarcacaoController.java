@@ -6,8 +6,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,10 +65,14 @@ public class EmbarcacaoController {
 		Proprietario p = new Proprietario();
 		p.setId(Long.valueOf(emb.getProprietario_id()));
 		emb.setProprietario(p);
+		
 		Embarcacao nova = repository.save(emb);
+		emb.setCaminhoImagem(nova.getId() + "_foto." + FilenameUtils.getExtension(emb.getImagem().getOriginalFilename()));;
+		emb.setCaminhoDocumento(nova.getId() + "_documento." + FilenameUtils.getExtension(emb.getDocumento().getOriginalFilename()));;
 		 try {
-		        fileSaveService.save(emb.getImagem(), nova.getId() + "_foto");	
-		        fileSaveService.save(emb.getDocumento(), nova.getId() + "_documento");
+		        fileSaveService.save(emb.getImagem(), emb.getCaminhoImagem());	
+		        fileSaveService.save(emb.getDocumento(), emb.getCaminhoDocumento());
+		        repository.save(emb);
 		    } catch (IOException e) {
 		    	System.out.println(e);
 		    		return ResponseEntity.badRequest().body(null);

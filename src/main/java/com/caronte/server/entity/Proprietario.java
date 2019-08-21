@@ -22,6 +22,8 @@ public class Proprietario {
 	private Long id;
 	
 	private String nome;
+	private String caminhoHabilitacao;
+	private String caminhoDocumento;
 	
 	@Transient
 	private MultipartFile habilitacao;
@@ -67,6 +69,18 @@ public class Proprietario {
 	}
 	public void setDocumento(MultipartFile documento) {
 		this.documento = documento;
+	}
+	public String getCaminhoHabilitacao() {
+		return caminhoHabilitacao;
+	}
+	public void setCaminhoHabilitacao(String caminhoHabilitacao) {
+		this.caminhoHabilitacao = caminhoHabilitacao;
+	}
+	public String getCaminhoDocumento() {
+		return caminhoDocumento;
+	}
+	public void setCaminhoDocumento(String caminhoDocumento) {
+		this.caminhoDocumento = caminhoDocumento;
 	}
 	
 }
