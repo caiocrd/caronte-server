@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,16 +57,21 @@ public class EmbarcacaoController {
 	
 	@CrossOrigin
 	@RequestMapping(value = "/embarcacoes", method = RequestMethod.POST)
+	@Transactional
 	ResponseEntity<?> newEmbarcacao( @ModelAttribute Embarcacao emb) {
 		
 		//Salvar arquivos
 		Proprietario p = new Proprietario();
 		p.setId(Long.valueOf(emb.getProprietario_id()));
 		emb.setProprietario(p);
+		
 		Embarcacao nova = repository.save(emb);
+		emb.setCaminhoImagem(nova.getId() + "_foto." + FilenameUtils.getExtension(emb.getImagem().getOriginalFilename()));;
+		emb.setCaminhoDocumento(nova.getId() + "_documento." + FilenameUtils.getExtension(emb.getDocumento().getOriginalFilename()));;
 		 try {
-		        fileSaveService.save(emb.getImagem(), nova.getId() + "_foto");	
-		        fileSaveService.save(emb.getDocumento(), nova.getId() + "_documento");
+		        fileSaveService.save(emb.getImagem(), emb.getCaminhoImagem());	
+		        fileSaveService.save(emb.getDocumento(), emb.getCaminhoDocumento());
+		        repository.save(emb);
 		    } catch (IOException e) {
 		    	System.out.println(e);
 		    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
