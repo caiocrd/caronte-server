@@ -1,28 +1,32 @@
 package com.caronte.server.controller;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import com.caronte.server.controller.dto.EmbarcacaoDTO;
+import com.caronte.server.controller.dto.MovimentacaoDTO;
 import com.caronte.server.entity.Embarcacao;
 import com.caronte.server.entity.Movimentacao;
 import com.caronte.server.entity.Proprietario;
 import com.caronte.server.entity.TipoMovimentacao;
-import com.caronte.server.exception.EmbarcacaoNotFoundExceprion;
 import com.caronte.server.repository.EmbarcacaoRepository;
 import com.caronte.server.repository.MovimentacaoRepository;
 import com.caronte.server.service.FileSaveService;
@@ -31,6 +35,7 @@ import com.caronte.server.service.FileSaveService;
 
 
 @RestController	
+@RequestMapping("embarcacoes")
 public class EmbarcacaoController {
 
 	private final EmbarcacaoRepository repository;
@@ -44,18 +49,15 @@ public class EmbarcacaoController {
 		this.movimentacaoRepository = movimentacaoRepository;
 	}
 	@CrossOrigin
-	@RequestMapping(value = "/embarcacoes", method = RequestMethod.GET)
-	List<Embarcacao> all(@RequestParam(required = false) String nome) {
-		ExampleMatcher customExampleMatcher = ExampleMatcher.matchingAny()
-			      .withMatcher("nome", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
-		Embarcacao emb = new Embarcacao(nome);
-	    Example<Embarcacao> examples = Example.of(emb, customExampleMatcher);
-		return repository.findAll(examples);
+	@GetMapping
+	List<EmbarcacaoDTO> all(@RequestParam(required = false, defaultValue = "") String nome) {
+		
+		return EmbarcacaoDTO.converter(repository.findByNomeContainingIgnoreCase(nome));
 	}
 	
 	@CrossOrigin
-	@RequestMapping(value = "/embarcacoes", method = RequestMethod.POST)
-	ResponseEntity<?> newEmbarcacao( @ModelAttribute Embarcacao emb) {
+	@PostMapping
+	ResponseEntity<?> newEmbarcacao( @ModelAttribute Embarcacao emb, UriComponentsBuilder uriBuilder) {
 		
 		//Salvar arquivos
 		Proprietario p = new Proprietario();
@@ -67,15 +69,16 @@ public class EmbarcacaoController {
 		        fileSaveService.save(emb.getDocumento(), nova.getId() + "_documento");
 		    } catch (IOException e) {
 		    	System.out.println(e);
-		    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		    		return ResponseEntity.badRequest().body(null);
 		    }
-		 return new ResponseEntity<>(HttpStatus.CREATED);
+		 URI uri = uriBuilder.path("/embarcacoes/{id}").buildAndExpand(nova.getId()).toUri();
+		 return ResponseEntity.created(uri).body(new EmbarcacaoDTO(nova));
 
 	}
 	
 	@CrossOrigin
-	@RequestMapping(value = "/embarcacao/{id}/movimentacao", method = RequestMethod.POST)
-	Movimentacao newMovimentacao(@RequestBody String ocorrencia, @PathVariable Long id) {
+	@PostMapping("/{id}/movimentacao")
+	ResponseEntity<MovimentacaoDTO> newMovimentacao(@RequestBody String ocorrencia, @PathVariable Long id, UriComponentsBuilder uriBuilder) {
 		
 		Embarcacao embarcacao = new Embarcacao(id);
 		Movimentacao last = movimentacaoRepository.findFirstByEmbarcacaoOrderByIdDesc(embarcacao);
@@ -87,19 +90,21 @@ public class EmbarcacaoController {
 			movimentacao.setTipo(TipoMovimentacao.SAIDA);
 		else
 			movimentacao.setTipo(TipoMovimentacao.ENTRADA);
-
-		return movimentacaoRepository.save(movimentacao);
+		URI uri = uriBuilder.path("/embarcacoes/{id}/movimentacoes").buildAndExpand(movimentacao.getId()).toUri();
+		return ResponseEntity.created(uri).body(new MovimentacaoDTO(movimentacao));
 
 	}
 	
 	@CrossOrigin
-	@RequestMapping(value = "/embarcacoes/{id}", method = RequestMethod.GET)
-	Embarcacao one(@PathVariable Long id) {
-
-		return repository.findById(id).orElseThrow(() -> new EmbarcacaoNotFoundExceprion(id));
+	@GetMapping("/{id}")
+	ResponseEntity<EmbarcacaoDTO> one(@PathVariable Long id) {
+		Optional<Embarcacao> embarcacao = repository.findById(id);
+		if(embarcacao.isPresent())
+			return ResponseEntity.ok().body(new EmbarcacaoDTO(embarcacao.get()));
+		return ResponseEntity.notFound().build();
 	}
 	@CrossOrigin
-	@RequestMapping(value = "/embarcacao/{id}", method = RequestMethod.PUT)
+	@PutMapping("/{id}")
 	Embarcacao replaceEmbarcacao(@RequestBody Embarcacao newEmbarcacao, @PathVariable Long id) {
 
 		return repository.findById(id).map(embarcacao -> {
@@ -111,7 +116,7 @@ public class EmbarcacaoController {
 		});
 	}
 	@CrossOrigin
-	@RequestMapping(value = "/embarcacao/{id}", method = RequestMethod.DELETE)
+	@DeleteMapping("/{id}")
 	void deleteEmbarcacao(@PathVariable Long id) {
 		repository.deleteById(id);
 	}
