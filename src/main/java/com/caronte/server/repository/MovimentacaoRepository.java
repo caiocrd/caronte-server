@@ -7,6 +7,7 @@ import com.caronte.server.entity.Movimentacao;
 
 public interface MovimentacaoRepository extends JpaRepository<Movimentacao, Long>{
 
-		public Movimentacao findFirstByEmbarcacaoOrderByIdDesc(Embarcacao embarcacao);
+	
+	public Movimentacao findFirstByEmbarcacaoOrderByIdDesc(Embarcacao embarcacao);
 	    
 }
