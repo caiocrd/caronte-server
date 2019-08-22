@@ -123,10 +123,14 @@ public class EmbarcacaoController {
 			p.setId(Long.valueOf(newEmbarcacao.getProprietario_id()));
 			embarcacao.setProprietario(p);
 			try {
-				if(newEmbarcacao.getDocumento() != null)
+				if(newEmbarcacao.getDocumento() != null){
+					embarcacao.setCaminhoDocumento(embarcacao.getId() + "_documento." + FilenameUtils.getExtension(newEmbarcacao.getDocumento().getOriginalFilename()));;
 					fileSaveService.save(newEmbarcacao.getDocumento(), embarcacao.getCaminhoDocumento());	
-				if(newEmbarcacao.getImagem() != null)
+				}
+				if(newEmbarcacao.getImagem() != null){
+					embarcacao.setCaminhoImagem(embarcacao.getId() + "_foto." + FilenameUtils.getExtension(newEmbarcacao.getImagem().getOriginalFilename()));;
 					fileSaveService.save(newEmbarcacao.getImagem(), embarcacao.getCaminhoImagem());	
+				}
 			} catch (IOException e) {
 		    	System.out.println(e);
 		    		return ResponseEntity.badRequest().body(null);

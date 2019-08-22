@@ -1,7 +1,9 @@
 package com.caronte.server.controller;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.caronte.server.entity.Proprietario;
 import com.caronte.server.exception.ProprietarioNotFoundExceprion;
@@ -72,16 +75,33 @@ public class ProprietarioController {
 		return retorno;
 	}
 	@CrossOrigin
-	@PutMapping("{id}")
-	Proprietario replaceProprietario(@RequestBody Proprietario newProprietario, @PathVariable Long id) {
-
-		return repository.findById(id).map(proprietario -> {
+	@PutMapping("/{id}")
+	ResponseEntity<?> replaceProprietario(@ModelAttribute Proprietario newProprietario, @PathVariable Long id, UriComponentsBuilder uriBuilder) {
+		
+		Optional<Proprietario> proprietarioOptional = repository.findById(id);
+		if(proprietarioOptional.isPresent()){
+			Proprietario proprietario = proprietarioOptional.get();
 			proprietario.setNome(newProprietario.getNome());
-			return repository.save(proprietario);
-		}).orElseGet(() -> {
-			newProprietario.setId(id);
-			return repository.save(newProprietario);
-		});
+			
+			
+			try {
+				if(newProprietario.getDocumento() != null){
+					proprietario.setCaminhoDocumento(proprietario.getId() + "_documento_proprietario." + FilenameUtils.getExtension(newProprietario.getDocumento().getOriginalFilename()));;
+					fileSaveService.save(newProprietario.getDocumento(), proprietario.getCaminhoDocumento());
+
+				}
+				if(newProprietario.getHabilitacao() != null)
+					proprietario.setCaminhoHabilitacao(proprietario.getId() + "_habilitacao." + FilenameUtils.getExtension(newProprietario.getHabilitacao().getOriginalFilename()));;
+					fileSaveService.save(newProprietario.getHabilitacao(), proprietario.getCaminhoHabilitacao());	
+			} catch (IOException e) {
+		    	System.out.println(e);
+		    		return ResponseEntity.badRequest().body(null);
+			}
+			repository.save(proprietario);
+			
+		}
+		URI uri = uriBuilder.path("/embarcacoes/{id}").buildAndExpand(id).toUri();
+		return ResponseEntity.created(uri).build();
 	}
 	@CrossOrigin
 	@DeleteMapping("{id}")
