@@ -10,8 +10,12 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,6 +28,7 @@ import com.caronte.server.repository.ProprietarioRepository;
 import com.caronte.server.service.FileSaveService;
 
 @RestController	
+@RequestMapping(value = "/proprietarios")
 public class ProprietarioController {
 
 	private final ProprietarioRepository repository;
@@ -35,7 +40,7 @@ public class ProprietarioController {
 		this.repository = repository;
 	}
 	@CrossOrigin
-	@RequestMapping(value = "/proprietarios", method = RequestMethod.GET)
+	@GetMapping
 	List<Proprietario> all(@RequestParam(required = false) String nome) {
 		ExampleMatcher customExampleMatcher = ExampleMatcher.matchingAny()
 			      .withMatcher("nome", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
@@ -44,7 +49,7 @@ public class ProprietarioController {
 		return repository.findAll(examples);
 	}
 	@CrossOrigin
-	@RequestMapping(value = "/proprietarios", method = RequestMethod.POST)
+	@PostMapping
 	ResponseEntity<?> newProprieteario(@ModelAttribute Proprietario proprietario) {
 		Proprietario nova = repository.save(proprietario);
 		proprietario.setCaminhoHabilitacao(nova.getId() + "_habilitacao." + FilenameUtils.getExtension(proprietario.getHabilitacao().getOriginalFilename()));;
@@ -60,14 +65,14 @@ public class ProprietarioController {
 		 return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 	@CrossOrigin
-	@RequestMapping(value = "/proprietarios/{id}", method = RequestMethod.GET)
+	@GetMapping("{id}")
 	Proprietario one(@PathVariable Long id) {
 		Proprietario retorno = repository.findById(id).orElseThrow(() -> new ProprietarioNotFoundExceprion(id));
 		retorno.getEmbarcacoes().size();
 		return retorno;
 	}
 	@CrossOrigin
-	@RequestMapping(value = "/proprietario/{id}", method = RequestMethod.PUT)
+	@PutMapping("{id}")
 	Proprietario replaceProprietario(@RequestBody Proprietario newProprietario, @PathVariable Long id) {
 
 		return repository.findById(id).map(proprietario -> {
@@ -79,7 +84,7 @@ public class ProprietarioController {
 		});
 	}
 	@CrossOrigin
-	@RequestMapping(value = "/proprietario/{id}", method = RequestMethod.DELETE)
+	@DeleteMapping("{id}")
 	void deleteProprietario(@PathVariable Long id) {
 		repository.deleteById(id);
 	}

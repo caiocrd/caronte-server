@@ -24,10 +24,6 @@ public class Embarcacao {
 	private String nome;
 	private String descricao;
 	
-	private String caminhoImagem;
-	
-	private String caminhoDocumento;
-	
 	@Transient
 	private MultipartFile imagem;
 	
@@ -44,6 +40,8 @@ public class Embarcacao {
 	@OneToMany(mappedBy = "embarcacao")
 	private List<Movimentacao> movimentacoes;
 	
+	private String caminhoImagem;
+	private String caminhoDocumento;
 	
 	public Embarcacao() {
 		// TODO Auto-generated constructor stub

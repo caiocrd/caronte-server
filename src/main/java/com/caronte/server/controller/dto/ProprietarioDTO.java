@@ -17,7 +17,8 @@ public class ProprietarioDTO {
 	public ProprietarioDTO(Proprietario proprietario) {
 		this.id = proprietario.getId();
 		this.nome = proprietario.getNome();
-		this.embarcacoes = proprietario.getEmbarcacoes().stream().map(embarcacao -> new EmbarcacaoDTO(embarcacao, this)).collect(Collectors.toList());
+		if(proprietario.getEmbarcacoes()!= null)
+			this.embarcacoes = proprietario.getEmbarcacoes().stream().map(embarcacao -> new EmbarcacaoDTO(embarcacao, this)).collect(Collectors.toList());
 	}
 	public Long getId() {
 		return id;

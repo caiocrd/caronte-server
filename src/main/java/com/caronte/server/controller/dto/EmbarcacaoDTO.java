@@ -22,6 +22,7 @@ public class EmbarcacaoDTO {
 	private List<MovimentacaoDTO> movimentacoes;
 	
 	public EmbarcacaoDTO(Embarcacao embarcacao) {
+		this.id = embarcacao.getId();
 		this.nome = embarcacao.getNome();
 		this.descricao = embarcacao.getDescricao();
 		this.proprietario = new ProprietarioDTO(embarcacao.getProprietario());

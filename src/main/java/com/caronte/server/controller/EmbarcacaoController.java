@@ -52,9 +52,9 @@ public class EmbarcacaoController {
 	}
 	@CrossOrigin
 	@GetMapping
-	List<EmbarcacaoDTO> all(@RequestParam(required = false, defaultValue = "") String nome) {
+	List<Embarcacao> all(@RequestParam(required = false, defaultValue = "") String nome) {
 		
-		return EmbarcacaoDTO.converter(repository.findByNomeContainingIgnoreCase(nome));
+		return repository.findByNomeContainingIgnoreCase(nome);
 	}
 	
 	@CrossOrigin
@@ -78,13 +78,13 @@ public class EmbarcacaoController {
 		    		return ResponseEntity.badRequest().body(null);
 		    }
 		 URI uri = uriBuilder.path("/embarcacoes/{id}").buildAndExpand(nova.getId()).toUri();
-		 return ResponseEntity.created(uri).body(new EmbarcacaoDTO(nova));
+		 return ResponseEntity.created(uri).body(nova);
 
 	}
 	
 	@CrossOrigin
 	@PostMapping("/{id}/movimentacao")
-	ResponseEntity<MovimentacaoDTO> newMovimentacao(@RequestBody String ocorrencia, @PathVariable Long id, UriComponentsBuilder uriBuilder) {
+	ResponseEntity<Movimentacao> newMovimentacao(@RequestBody String ocorrencia, @PathVariable Long id, UriComponentsBuilder uriBuilder) {
 		
 		Embarcacao embarcacao = new Embarcacao(id);
 		Movimentacao last = movimentacaoRepository.findFirstByEmbarcacaoOrderByIdDesc(embarcacao);
@@ -96,17 +96,18 @@ public class EmbarcacaoController {
 			movimentacao.setTipo(TipoMovimentacao.SAIDA);
 		else
 			movimentacao.setTipo(TipoMovimentacao.ENTRADA);
+		movimentacaoRepository.save(movimentacao);
 		URI uri = uriBuilder.path("/embarcacoes/{id}/movimentacoes").buildAndExpand(movimentacao.getId()).toUri();
-		return ResponseEntity.created(uri).body(new MovimentacaoDTO(movimentacao));
+		return ResponseEntity.created(uri).body(movimentacao);
 
 	}
 	
 	@CrossOrigin
 	@GetMapping("/{id}")
-	ResponseEntity<EmbarcacaoDTO> one(@PathVariable Long id) {
+	ResponseEntity<Embarcacao> one(@PathVariable Long id) {
 		Optional<Embarcacao> embarcacao = repository.findById(id);
 		if(embarcacao.isPresent())
-			return ResponseEntity.ok().body(new EmbarcacaoDTO(embarcacao.get()));
+			return ResponseEntity.ok().body(embarcacao.get());
 		return ResponseEntity.notFound().build();
 	}
 	@CrossOrigin
