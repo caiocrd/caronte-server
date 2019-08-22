@@ -112,15 +112,30 @@ public class EmbarcacaoController {
 	}
 	@CrossOrigin
 	@PutMapping("/{id}")
-	Embarcacao replaceEmbarcacao(@RequestBody Embarcacao newEmbarcacao, @PathVariable Long id) {
-
-		return repository.findById(id).map(embarcacao -> {
+	ResponseEntity<?> replaceEmbarcacao(@ModelAttribute Embarcacao newEmbarcacao, @PathVariable Long id, UriComponentsBuilder uriBuilder) {
+		
+		Optional<Embarcacao> embarcacaoOptional = repository.findById(id);
+		if(embarcacaoOptional.isPresent()){
+			Embarcacao embarcacao = embarcacaoOptional.get();
 			embarcacao.setNome(newEmbarcacao.getNome());
-			return repository.save(embarcacao);
-		}).orElseGet(() -> {
-			newEmbarcacao.setId(id);
-			return repository.save(newEmbarcacao);
-		});
+			embarcacao.setDescricao(newEmbarcacao.getDescricao());
+			Proprietario p = new Proprietario();
+			p.setId(Long.valueOf(newEmbarcacao.getProprietario_id()));
+			embarcacao.setProprietario(p);
+			try {
+				if(newEmbarcacao.getDocumento() != null)
+					fileSaveService.save(newEmbarcacao.getDocumento(), embarcacao.getCaminhoDocumento());	
+				if(newEmbarcacao.getImagem() != null)
+					fileSaveService.save(newEmbarcacao.getImagem(), embarcacao.getCaminhoImagem());	
+			} catch (IOException e) {
+		    	System.out.println(e);
+		    		return ResponseEntity.badRequest().body(null);
+			}
+			repository.save(embarcacao);
+			
+		}
+		URI uri = uriBuilder.path("/embarcacoes/{id}").buildAndExpand(id).toUri();
+		return ResponseEntity.created(uri).build();
 	}
 	@CrossOrigin
 	@DeleteMapping("/{id}")
