@@ -76,19 +76,19 @@ public class ProprietarioController {
 	ResponseEntity<Dependente> newMovimentacao(@ModelAttribute Dependente dependente, @PathVariable Long id, UriComponentsBuilder uriBuilder) {
 		Proprietario titular = new Proprietario(id);
 		dependente.setTitular(titular);
-		dependenteRepository.save(dependente);
-		dependente.setCaminhoHabilitacao(dependente.getId() + "_habilitacao_dependente." + FilenameUtils.getExtension(dependente.getHabilitacao().getOriginalFilename()));;
-		dependente.setCaminhoDocumento(dependente.getId() + "_documento_dependente." + FilenameUtils.getExtension(dependente.getDocumento().getOriginalFilename()));;
+		Dependente novo = dependenteRepository.save(dependente);
+		novo.setCaminhoHabilitacao(novo.getId() + "_habilitacao_dependente." + FilenameUtils.getExtension(dependente.getHabilitacao().getOriginalFilename()));;
+		novo.setCaminhoDocumento(novo.getId() + "_documento_dependente." + FilenameUtils.getExtension(dependente.getDocumento().getOriginalFilename()));;
 		try {
-			fileSaveService.save(dependente.getDocumento(), dependente.getCaminhoDocumento());	
-			fileSaveService.save(dependente.getHabilitacao(), dependente.getCaminhoHabilitacao());
-			dependenteRepository.save(dependente);
+			fileSaveService.save(dependente.getDocumento(), novo.getCaminhoDocumento());	
+			fileSaveService.save(dependente.getHabilitacao(), novo.getCaminhoHabilitacao());
+			dependenteRepository.save(novo);
 		} catch (IOException e) {
 			System.out.println(e);
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		URI uri = uriBuilder.path("/embarcacoes/{id}/movimentacoes").buildAndExpand(dependente.getId()).toUri();
-		return ResponseEntity.created(uri).body(dependente);
+		return ResponseEntity.created(uri).build();
 
 	}
 
@@ -115,9 +115,10 @@ public class ProprietarioController {
 					fileSaveService.save(newProprietario.getDocumento(), proprietario.getCaminhoDocumento());
 
 				}
-				if(newProprietario.getHabilitacao() != null)
+				if(newProprietario.getHabilitacao() != null){
 					proprietario.setCaminhoHabilitacao(proprietario.getId() + "_habilitacao." + FilenameUtils.getExtension(newProprietario.getHabilitacao().getOriginalFilename()));;
 					fileSaveService.save(newProprietario.getHabilitacao(), proprietario.getCaminhoHabilitacao());	
+				}
 			} catch (IOException e) {
 		    	System.out.println(e);
 		    		return ResponseEntity.badRequest().body(null);
