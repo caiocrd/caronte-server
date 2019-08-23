@@ -39,7 +39,6 @@ public class User extends DateAudit {
     @NotBlank
     private String username;
 
-    @NaturalId
     @NotBlank
     @Email
     private String email;
