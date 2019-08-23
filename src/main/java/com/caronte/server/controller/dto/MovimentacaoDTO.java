@@ -18,7 +18,7 @@ public class MovimentacaoDTO {
 	public MovimentacaoDTO(Movimentacao movimentacao) {
 		this.data = movimentacao.getData();
 		this.id = movimentacao.getId();
-		this.ocorrencia = movimentacao.getOcorrencia();
+		
 	}
 	public Long getId() {
 		return id;

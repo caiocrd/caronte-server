@@ -1,5 +1,7 @@
 package com.caronte.server.entity;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import javax.persistence.Entity;
@@ -23,7 +25,9 @@ public class Movimentacao {
 	
 	private Calendar data;
 	
-	private String ocorrencia;
+	private String descricao;
+
+	private boolean ocorrencia;
 	
 	@ManyToOne
 	@JsonIgnore
@@ -53,12 +57,19 @@ public class Movimentacao {
 		this.data = data;
 	}
 
-	public String getOcorrencia() {
+	public boolean getOcorrencia() {
 		return ocorrencia;
 	}
 
-	public void setOcorrencia(String ocorrencia) {
+	public void setOcorrencia(boolean ocorrencia) {
 		this.ocorrencia = ocorrencia;
+	}
+
+	public String getDescricao(){
+		return this.descricao;
+	}
+	public void setDescricao(String descricao){
+		this.descricao = descricao;
 	}
 
 	public Embarcacao getEmbarcacao() {
@@ -68,6 +79,10 @@ public class Movimentacao {
 	public void setEmbarcacao(Embarcacao embarcacao) {
 		this.embarcacao = embarcacao;
 	}
-	
+	public String getDataFormatada(){
+		DateFormat dateFormat = new SimpleDateFormat("dd/mm/yyyy hh:mm");
+		String strDate = dateFormat.format(this.getData().getTime());
+		return strDate;
+	}
 	
 }

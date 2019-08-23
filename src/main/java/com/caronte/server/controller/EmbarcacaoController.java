@@ -82,18 +82,20 @@ public class EmbarcacaoController {
 	
 	@CrossOrigin
 	@PostMapping("/{id}/movimentacao")
-	ResponseEntity<Movimentacao> newMovimentacao(@RequestBody String ocorrencia, @PathVariable Long id, UriComponentsBuilder uriBuilder) {
+	ResponseEntity<Movimentacao> newMovimentacao(@RequestBody Movimentacao movimentacao, @PathVariable Long id, UriComponentsBuilder uriBuilder) {
 		
 		Embarcacao embarcacao = new Embarcacao(id);
-		Movimentacao last = movimentacaoRepository.findFirstByEmbarcacaoOrderByIdDesc(embarcacao);
-		Movimentacao movimentacao = new Movimentacao();
-		movimentacao.setOcorrencia(ocorrencia);
 		movimentacao.setEmbarcacao(embarcacao);
 		movimentacao.setData(Calendar.getInstance());
-		if(last == null || last.getTipo() == TipoMovimentacao.ENTRADA)
-			movimentacao.setTipo(TipoMovimentacao.SAIDA);
-		else
-			movimentacao.setTipo(TipoMovimentacao.ENTRADA);
+		if(movimentacao.getOcorrencia())
+			movimentacao.setTipo(TipoMovimentacao.OCORRENCIA);
+		else{
+			Movimentacao last = movimentacaoRepository.findFirstByEmbarcacaoAndTipoNotOrderByIdDesc(embarcacao, TipoMovimentacao.OCORRENCIA);
+			if(last == null || last.getTipo() == TipoMovimentacao.ENTRADA)
+				movimentacao.setTipo(TipoMovimentacao.SAIDA);
+			else
+				movimentacao.setTipo(TipoMovimentacao.ENTRADA);
+		}
 		movimentacaoRepository.save(movimentacao);
 		URI uri = uriBuilder.path("/embarcacoes/{id}/movimentacoes").buildAndExpand(movimentacao.getId()).toUri();
 		return ResponseEntity.created(uri).body(movimentacao);
