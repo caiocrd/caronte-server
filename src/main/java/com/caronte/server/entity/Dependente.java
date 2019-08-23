@@ -6,13 +6,17 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import org.springframework.web.multipart.MultipartFile;
 
 @Entity
-public class Proprietario {
+public class Dependente {
 
 	@Id
 	@GeneratedValue
@@ -28,20 +32,15 @@ public class Proprietario {
 	@Transient
 	private MultipartFile documento;
 	
-	@OneToMany(mappedBy = "proprietario", cascade = CascadeType.ALL)
-	private List<Embarcacao> embarcacoes;
+	@ManyToOne
+	@JsonIgnore
+	private Proprietario titular;
 	
-	@OneToMany(mappedBy = "titular", cascade = CascadeType.ALL)
-	private List<Dependente> dependentes;
-
-	public Proprietario() {
+	public Dependente() {
 		// TODO Auto-generated constructor stub
 	}
-	public Proprietario(String nome) {
+	public Dependente(String nome) {
 		this.nome = nome;
-	}
-	public Proprietario(Long id) {
-		this.id = id;
 	}
 	public Long getId() {
 		return id;
@@ -54,12 +53,6 @@ public class Proprietario {
 	}
 	public void setNome(String nome) {
 		this.nome = nome;
-	}
-	public List<Embarcacao> getEmbarcacoes() {
-		return embarcacoes;
-	}
-	public void setEmbarcacoes(List<Embarcacao> embarcacoes) {
-		this.embarcacoes = embarcacoes;
 	}
 	public MultipartFile getHabilitacao() {
 		return habilitacao;
@@ -85,13 +78,11 @@ public class Proprietario {
 	public void setCaminhoDocumento(String caminhoDocumento) {
 		this.caminhoDocumento = caminhoDocumento;
 	}
-
-	public List<Dependente> getDependentes() {
-		return dependentes;
+	public Proprietario getTitular() {
+		return titular;
 	}
-
-	public void setDependentes(List<Dependente> dependentes) {
-		this.dependentes = dependentes;
+	public void setTitular(Proprietario titular) {
+		this.titular = titular;
 	}
 	
 	

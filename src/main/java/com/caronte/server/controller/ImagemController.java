@@ -46,23 +46,11 @@ public class ImagemController {
 //	}
 	
 	@GetMapping(path = "/documento")
-    public ResponseEntity<Resource> download(@RequestParam("caminho") String caminho) throws IOException {
+    public @ResponseBody void download(HttpServletResponse response, @RequestParam("caminho") String caminho) throws IOException {
 		File file = new File(IMAGEM_DIR+"/"+caminho);
-
-        HttpHeaders header = new HttpHeaders();
-        header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+file.getName());
-        header.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        header.add("Pragma", "no-cache");
-        header.add("Expires", "0");
-
-        Path path = Paths.get(file.getAbsolutePath());
-        ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
-
-        return ResponseEntity.ok()
-                .headers(header)
-                .contentLength(file.length())
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
-                .body(resource);
+	    InputStream in = new FileInputStream(file);
+	    response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+	    IOUtils.copy(in, response.getOutputStream());
     }
 	
 	

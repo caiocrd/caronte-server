@@ -1,5 +1,5 @@
 package com.caronte.server.entity;
 
 public enum TipoMovimentacao {
-	ENTRADA, SAIDA
+	ENTRADA, SAIDA, OCORRENCIA
 }

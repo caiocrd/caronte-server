@@ -5,6 +5,13 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import com.caronte.server.entity.Dependente;
+import com.caronte.server.entity.Proprietario;
+import com.caronte.server.exception.ProprietarioNotFoundExceprion;
+import com.caronte.server.repository.DependenteRepository;
+import com.caronte.server.repository.ProprietarioRepository;
+import com.caronte.server.service.FileSaveService;
+
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -18,17 +25,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import com.caronte.server.entity.Proprietario;
-import com.caronte.server.exception.ProprietarioNotFoundExceprion;
-import com.caronte.server.repository.ProprietarioRepository;
-import com.caronte.server.service.FileSaveService;
 
 @RestController	
 @RequestMapping(value = "/proprietarios")
@@ -36,6 +36,9 @@ public class ProprietarioController {
 
 	private final ProprietarioRepository repository;
 	
+	@Autowired
+	private DependenteRepository dependenteRepository;
+
 	@Autowired
 	private FileSaveService fileSaveService;
 
@@ -67,6 +70,28 @@ public class ProprietarioController {
 		    }
 		 return new ResponseEntity<>(HttpStatus.CREATED);
 	}
+
+	@CrossOrigin
+	@PostMapping("/{id}/dependente")
+	ResponseEntity<Dependente> newMovimentacao(@ModelAttribute Dependente dependente, @PathVariable Long id, UriComponentsBuilder uriBuilder) {
+		Proprietario titular = new Proprietario(id);
+		dependente.setTitular(titular);
+		dependenteRepository.save(dependente);
+		dependente.setCaminhoHabilitacao(dependente.getId() + "_habilitacao_dependente." + FilenameUtils.getExtension(dependente.getHabilitacao().getOriginalFilename()));;
+		dependente.setCaminhoDocumento(dependente.getId() + "_documento_dependente." + FilenameUtils.getExtension(dependente.getDocumento().getOriginalFilename()));;
+		try {
+			fileSaveService.save(dependente.getDocumento(), dependente.getCaminhoDocumento());	
+			fileSaveService.save(dependente.getHabilitacao(), dependente.getCaminhoHabilitacao());
+			dependenteRepository.save(dependente);
+		} catch (IOException e) {
+			System.out.println(e);
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		URI uri = uriBuilder.path("/embarcacoes/{id}/movimentacoes").buildAndExpand(dependente.getId()).toUri();
+		return ResponseEntity.created(uri).body(dependente);
+
+	}
+
 	@CrossOrigin
 	@GetMapping("{id}")
 	Proprietario one(@PathVariable Long id) {
