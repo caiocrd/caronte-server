@@ -6,6 +6,7 @@ import java.util.Collections;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -47,6 +48,9 @@ public class AuthController {
 
         @Autowired
         JwtTokenProvider tokenProvider;
+        
+        @Value("${app.jwtExpirationInMs}")
+        private int jwtExpirationInMs;
 
         @RequestMapping(value = "/sigin", method = RequestMethod.POST)
         public ResponseEntity<?> authenticateUser(@Valid @RequestBody User loginRequest) {
@@ -57,9 +61,9 @@ public class AuthController {
                         )
                 );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-
+                
                 String jwt = tokenProvider.generateToken(authentication);
-                AuthInfo auth = new AuthInfo((UserPrincipal) authentication.getPrincipal(), jwt);
+                AuthInfo auth = new AuthInfo((UserPrincipal) authentication.getPrincipal(), jwt, this.jwtExpirationInMs);
                 return ResponseEntity.ok((auth));
         }
 	
