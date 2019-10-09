@@ -8,7 +8,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -24,9 +26,11 @@ public class Embarcacao {
 	private String nome;
 	private String descricao;
 	
+	@NotNull
 	@Transient
 	private MultipartFile imagem;
 	
+	@NotNull
 	@Transient
 	private MultipartFile documento;
 	

@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -21,9 +22,11 @@ public class Dependente {
 	private String caminhoHabilitacao;
 	private String caminhoDocumento;
 	
+	@NotNull
 	@Transient
 	private MultipartFile habilitacao;
 	
+	@NotNull
 	@Transient
 	private MultipartFile documento;
 	

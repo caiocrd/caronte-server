@@ -19,10 +19,14 @@ public class FileSaveService {
 		 if (file.isEmpty()) {
 	            return; //next pls
 	        }
-
 	        byte[] bytes = file.getBytes();
 	        Path path = Paths.get(IMAGEM_DIR + nome);
 	        Files.write(path, bytes);
+	}
+	public void remove(String nome) throws IOException {
+		Path path = Paths.get(IMAGEM_DIR + nome);
+		System.out.println(path);
+		Files.delete(path);
 	}
 	
 	

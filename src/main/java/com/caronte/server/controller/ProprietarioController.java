@@ -18,6 +18,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,22 +74,29 @@ public class ProprietarioController {
 
 	@CrossOrigin
 	@PostMapping("/{id}/dependente")
-	ResponseEntity<Dependente> newMovimentacao(@ModelAttribute Dependente dependente, @PathVariable Long id, UriComponentsBuilder uriBuilder) {
+	@Transactional
+	ResponseEntity<Dependente> newDependente(@ModelAttribute Dependente dependente, @PathVariable Long id, UriComponentsBuilder uriBuilder) {
 		Proprietario titular = new Proprietario(id);
 		dependente.setTitular(titular);
-		Dependente novo = dependenteRepository.save(dependente);
-		novo.setCaminhoHabilitacao(novo.getId() + "_habilitacao_dependente." + FilenameUtils.getExtension(dependente.getHabilitacao().getOriginalFilename()));;
-		novo.setCaminhoDocumento(novo.getId() + "_documento_dependente." + FilenameUtils.getExtension(dependente.getDocumento().getOriginalFilename()));;
-		try {
-			fileSaveService.save(dependente.getDocumento(), novo.getCaminhoDocumento());	
-			fileSaveService.save(dependente.getHabilitacao(), novo.getCaminhoHabilitacao());
-			dependenteRepository.save(novo);
-		} catch (IOException e) {
-			System.out.println(e);
+		Dependente novo = new Dependente();
+		if(dependente.getDocumento() != null && dependente.getHabilitacao() != null){
+			try {
+				novo = dependenteRepository.save(dependente);
+				novo.setCaminhoHabilitacao(novo.getId() + "_habilitacao_dependente." + FilenameUtils.getExtension(dependente.getHabilitacao().getOriginalFilename()));;
+				novo.setCaminhoDocumento(novo.getId() + "_documento_dependente." + FilenameUtils.getExtension(dependente.getDocumento().getOriginalFilename()));;
+				fileSaveService.save(dependente.getDocumento(), novo.getCaminhoDocumento());	
+				fileSaveService.save(dependente.getHabilitacao(), novo.getCaminhoHabilitacao());
+				dependenteRepository.save(novo);
+			} catch (IOException e) {
+				System.out.println(e);
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+		}else { 
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		URI uri = uriBuilder.path("/embarcacoes/{id}/movimentacoes").buildAndExpand(dependente.getId()).toUri();
-		return ResponseEntity.created(uri).build();
+		return ResponseEntity.created(uri).body(novo);
+		
 
 	}
 
@@ -121,7 +129,7 @@ public class ProprietarioController {
 				}
 			} catch (IOException e) {
 		    	System.out.println(e);
-		    		return ResponseEntity.badRequest().body(null);
+		    	return ResponseEntity.badRequest().body(null);
 			}
 			repository.save(proprietario);
 			
@@ -131,8 +139,18 @@ public class ProprietarioController {
 	}
 	@CrossOrigin
 	@DeleteMapping("{id}")
-	void deleteProprietario(@PathVariable Long id) {
+	ResponseEntity<?> deleteProprietario(@PathVariable Long id) {
+		Proprietario proprietario = repository.findById(id).get();
+		try {
+			fileSaveService.remove(proprietario.getCaminhoDocumento());
+			fileSaveService.remove(proprietario.getCaminhoHabilitacao());
+
+		} catch (IOException e) {
+			return ResponseEntity.badRequest().body(null);
+		}
 		repository.deleteById(id);
+		return ResponseEntity.ok().build();
+		
 	}
 
 }

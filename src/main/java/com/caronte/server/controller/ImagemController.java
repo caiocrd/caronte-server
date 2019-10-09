@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -48,8 +49,12 @@ public class ImagemController {
 	@GetMapping(path = "/documento")
     public @ResponseBody void download(HttpServletResponse response, @RequestParam("caminho") String caminho) throws IOException {
 		File file = new File(IMAGEM_DIR+"/"+caminho);
-	    InputStream in = new FileInputStream(file);
-	    response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+		InputStream in = new FileInputStream(file);
+		if(FilenameUtils.getExtension(caminho).equalsIgnoreCase("pdf")){
+			response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+		}else{
+			response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+		}
 	    IOUtils.copy(in, response.getOutputStream());
     }
 	

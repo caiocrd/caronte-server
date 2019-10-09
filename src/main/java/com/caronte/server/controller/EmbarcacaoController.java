@@ -143,8 +143,17 @@ public class EmbarcacaoController {
 	}
 	@CrossOrigin
 	@DeleteMapping("/{id}")
-	void deleteEmbarcacao(@PathVariable Long id) {
+	ResponseEntity<?> deleteEmbarcacao(@PathVariable Long id) {
+		Embarcacao embarcacao = repository.findById(id).get();
+		try {
+			fileSaveService.remove(embarcacao.getCaminhoDocumento());
+			fileSaveService.remove(embarcacao.getCaminhoImagem());
+
+		} catch (IOException e) {
+			return ResponseEntity.badRequest().body(null);
+		}
 		repository.deleteById(id);
+		return ResponseEntity.ok().build();
 	}
 
 }

@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,9 +23,10 @@ public class Proprietario {
 	private String caminhoHabilitacao;
 	private String caminhoDocumento;
 	
+	@NotNull
 	@Transient
 	private MultipartFile habilitacao;
-	
+	@NotNull
 	@Transient
 	private MultipartFile documento;
 	
