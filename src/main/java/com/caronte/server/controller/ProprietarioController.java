@@ -74,14 +74,12 @@ public class ProprietarioController {
 
 	@CrossOrigin
 	@PostMapping("/{id}/dependente")
-	@Transactional
 	ResponseEntity<Dependente> newDependente(@ModelAttribute Dependente dependente, @PathVariable Long id, UriComponentsBuilder uriBuilder) {
 		Proprietario titular = new Proprietario(id);
 		dependente.setTitular(titular);
-		Dependente novo = new Dependente();
+		Dependente novo = dependenteRepository.save(dependente);
 		if(dependente.getDocumento() != null && dependente.getHabilitacao() != null){
 			try {
-				novo = dependenteRepository.save(dependente);
 				novo.setCaminhoHabilitacao(novo.getId() + "_habilitacao_dependente." + FilenameUtils.getExtension(dependente.getHabilitacao().getOriginalFilename()));;
 				novo.setCaminhoDocumento(novo.getId() + "_documento_dependente." + FilenameUtils.getExtension(dependente.getDocumento().getOriginalFilename()));;
 				fileSaveService.save(dependente.getDocumento(), novo.getCaminhoDocumento());	

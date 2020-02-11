@@ -3,20 +3,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,14 +30,7 @@ public class ImagemController {
 	    response.setContentType(MediaType.IMAGE_JPEG_VALUE);
 	    IOUtils.copy(in, response.getOutputStream());
 	}
-	
-//	@GetMapping(value = "/documento")
-//	public @ResponseBody void getDocumentoEmbarcacao(HttpServletResponse response, @RequestParam(required = false) String caminho) throws IOException {
-//		File file = new File(IMAGEM_DIR+"/"+caminho);
-//	    InputStream in = new FileInputStream(file);
-//	    response.setContentType(MediaType.MULTIPART_FORM_DATA_VALUE);
-//	    IOUtils.copy(in, response.getOutputStream());
-//	}
+
 	
 	@GetMapping(path = "/documento")
     public @ResponseBody void download(HttpServletResponse response, @RequestParam("caminho") String caminho) throws IOException {

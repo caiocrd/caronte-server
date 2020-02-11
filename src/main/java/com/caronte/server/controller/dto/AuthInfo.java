@@ -1,6 +1,5 @@
 package com.caronte.server.controller.dto;
 
-import com.caronte.server.entity.User;
 import com.caronte.server.security.UserPrincipal;
 
 public class AuthInfo {

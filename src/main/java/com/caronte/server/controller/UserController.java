@@ -2,7 +2,6 @@ package com.caronte.server.controller;
 
 import java.net.URI;
 import java.util.Collections;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 

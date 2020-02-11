@@ -4,7 +4,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.caronte.server.entity.Proprietario;
 import com.caronte.server.entity.Role;
 import com.caronte.server.entity.RoleName;
 import com.caronte.server.repository.RoleRepository;

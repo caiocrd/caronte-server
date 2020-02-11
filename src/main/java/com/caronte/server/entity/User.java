@@ -15,7 +15,6 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
-import org.hibernate.annotations.NaturalId;
 
 import com.caronte.server.entity.audit.DateAudit;
 
@@ -29,6 +28,11 @@ import com.caronte.server.entity.audit.DateAudit;
         })
 })
 public class User extends DateAudit {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue
     private Long id;

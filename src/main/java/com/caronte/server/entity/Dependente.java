@@ -22,11 +22,9 @@ public class Dependente {
 	private String caminhoHabilitacao;
 	private String caminhoDocumento;
 	
-	@NotNull
 	@Transient
 	private MultipartFile habilitacao;
 	
-	@NotNull
 	@Transient
 	private MultipartFile documento;
 	

@@ -80,7 +80,7 @@ public class Movimentacao {
 		this.embarcacao = embarcacao;
 	}
 	public String getDataFormatada(){
-		DateFormat dateFormat = new SimpleDateFormat("dd/mm/yyyy hh:mm");
+		DateFormat dateFormat = new SimpleDateFormat("dd/mm/yyyy HH:mm");
 		String strDate = dateFormat.format(this.getData().getTime());
 		return strDate;
 	}
