@@ -5,20 +5,12 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-import com.caronte.server.entity.Dependente;
-import com.caronte.server.entity.Proprietario;
-import com.caronte.server.exception.ProprietarioNotFoundExceprion;
-import com.caronte.server.repository.DependenteRepository;
-import com.caronte.server.repository.ProprietarioRepository;
-import com.caronte.server.service.FileSaveService;
-
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +22,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import com.caronte.server.entity.Dependente;
+import com.caronte.server.entity.Proprietario;
+import com.caronte.server.exception.ProprietarioNotFoundExceprion;
+import com.caronte.server.repository.DependenteRepository;
+import com.caronte.server.repository.ProprietarioRepository;
+import com.caronte.server.service.FileSaveService;
 
 @RestController	
 @RequestMapping(value = "/proprietarios")
@@ -59,16 +58,29 @@ public class ProprietarioController {
 	@PostMapping
 	ResponseEntity<?> newProprieteario(@ModelAttribute Proprietario proprietario) {
 		Proprietario nova = repository.save(proprietario);
-		proprietario.setCaminhoHabilitacao(nova.getId() + "_habilitacao." + FilenameUtils.getExtension(proprietario.getHabilitacao().getOriginalFilename()));;
-		proprietario.setCaminhoDocumento(nova.getId() + "_documento_proprietario." + FilenameUtils.getExtension(proprietario.getDocumento().getOriginalFilename()));;
+		String extensaoHabilitacao = FilenameUtils.getExtension(proprietario.getHabilitacao().getOriginalFilename());
+		String extensaoDocumento = FilenameUtils.getExtension(proprietario.getDocumento().getOriginalFilename());
+		proprietario.setCaminhoHabilitacao(nova.getId() + "_habilitacao." + extensaoHabilitacao);
+		proprietario.setCaminhoDocumento(nova.getId() + "_documento_proprietario." + extensaoDocumento);
+		proprietario.setCaminhoDocumentoPng(proprietario.getCaminhoDocumento());
+		proprietario.setCaminhoHabilitacaoPng(proprietario.getCaminhoHabilitacaoPng());
+		
 		 try {
-		        fileSaveService.save(nova.getDocumento(), proprietario.getCaminhoDocumento());	
-		        fileSaveService.save(nova.getHabilitacao(), proprietario.getCaminhoHabilitacao());
-		        repository.save(proprietario);
-		    } catch (IOException e) {
-		    	System.out.println(e);
-		    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		    }
+	        fileSaveService.save(nova.getDocumento(), proprietario.getCaminhoDocumento());	
+	        fileSaveService.save(nova.getHabilitacao(), proprietario.getCaminhoHabilitacao());
+	        if(extensaoDocumento.equalsIgnoreCase("pdf")) {
+	        		fileSaveService.createImageFromPdf(proprietario.getCaminhoDocumento());
+	        		proprietario.setCaminhoDocumentoPng(nova.getId() + "_documento_proprietario.png");
+	        }
+	        if(extensaoHabilitacao.equalsIgnoreCase("pdf")) {
+	        		fileSaveService.createImageFromPdf(proprietario.getCaminhoHabilitacao());
+	        		proprietario.setCaminhoHabilitacaoPng(nova.getId() + "_habilitacao.png");
+	        }
+	        repository.save(proprietario);
+	    } catch (IOException e) {
+	    	System.out.println(e);
+	    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	    }
 		 return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
@@ -94,7 +106,6 @@ public class ProprietarioController {
 		}
 		URI uri = uriBuilder.path("/embarcacoes/{id}/movimentacoes").buildAndExpand(dependente.getId()).toUri();
 		return ResponseEntity.created(uri).body(novo);
-		
 
 	}
 
@@ -114,16 +125,24 @@ public class ProprietarioController {
 			Proprietario proprietario = proprietarioOptional.get();
 			proprietario.setNome(newProprietario.getNome());
 			
-			
 			try {
 				if(newProprietario.getDocumento() != null){
 					proprietario.setCaminhoDocumento(proprietario.getId() + "_documento_proprietario." + FilenameUtils.getExtension(newProprietario.getDocumento().getOriginalFilename()));;
+					proprietario.setCaminhoDocumentoPng(proprietario.getCaminhoDocumento());
 					fileSaveService.save(newProprietario.getDocumento(), proprietario.getCaminhoDocumento());
+					if(FilenameUtils.getExtension(newProprietario.getDocumento().getOriginalFilename()).equalsIgnoreCase("pdf")) {
+						fileSaveService.createImageFromPdf(proprietario.getCaminhoDocumento());
+						proprietario.setCaminhoDocumentoPng(proprietario.getId() + "_documento_proprietario.png");;
+					}
 
 				}
 				if(newProprietario.getHabilitacao() != null){
 					proprietario.setCaminhoHabilitacao(proprietario.getId() + "_habilitacao." + FilenameUtils.getExtension(newProprietario.getHabilitacao().getOriginalFilename()));;
-					fileSaveService.save(newProprietario.getHabilitacao(), proprietario.getCaminhoHabilitacao());	
+					fileSaveService.save(newProprietario.getHabilitacao(), proprietario.getCaminhoHabilitacao());
+					if(FilenameUtils.getExtension(newProprietario.getHabilitacao().getOriginalFilename()).equalsIgnoreCase("pdf")) {
+						fileSaveService.createImageFromPdf(proprietario.getCaminhoHabilitacao());
+						proprietario.setCaminhoHabilitacaoPng(proprietario.getId() + "_habilitacao.png");;
+					}
 				}
 			} catch (IOException e) {
 		    	System.out.println(e);

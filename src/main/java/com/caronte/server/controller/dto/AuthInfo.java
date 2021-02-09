@@ -6,11 +6,11 @@ public class AuthInfo {
 
 	private UserPrincipal usuario;
 	
-	private int expiresIn;
+	private Long expiresIn;
 	
 	private String jwt;
 	
-	public AuthInfo(UserPrincipal usuario, String jwt, int expriresIn){
+	public AuthInfo(UserPrincipal usuario, String jwt, Long expriresIn){
         this.usuario = usuario;
         this.jwt = jwt;
         this.expiresIn = expriresIn;
@@ -29,10 +29,10 @@ public class AuthInfo {
 	public void setJwt(String jwt) {
 		this.jwt = jwt;
 	}
-	public int getExpiresIn() {
+	public Long getExpiresIn() {
 		return expiresIn;
 	}
-	public void setExpiresIn(int expiresIn) {
+	public void setExpiresIn(Long expiresIn) {
 		this.expiresIn = expiresIn;
 	}
 	

@@ -45,6 +45,7 @@ public class Embarcacao {
 	
 	private String caminhoImagem;
 	private String caminhoDocumento;
+	private String caminhoDocumentoPng;
 	
 	public Embarcacao() {
 		// TODO Auto-generated constructor stub
@@ -114,6 +115,12 @@ public class Embarcacao {
 	}
 	public void setCaminhoDocumento(String caminhoDocumento) {
 		this.caminhoDocumento = caminhoDocumento;
+	}
+	public String getCaminhoDocumentoPng() {
+		return caminhoDocumentoPng;
+	}
+	public void setCaminhoDocumentoPng(String caminhoDocumentoPng) {
+		this.caminhoDocumentoPng = caminhoDocumentoPng;
 	}
 	
 	

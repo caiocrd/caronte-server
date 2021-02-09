@@ -1,6 +1,7 @@
 package com.caronte.server.controller;
 
 import java.net.URI;
+import java.util.Calendar;
 import java.util.Collections;
 
 import javax.validation.Valid;
@@ -50,7 +51,7 @@ public class AuthController {
         JwtTokenProvider tokenProvider;
         
         @Value("${app.jwtExpirationInMs}")
-        private int jwtExpirationInMs;
+        private Long jwtExpirationInMs;
 
         @RequestMapping(value = "/sigin", method = RequestMethod.POST)
         public ResponseEntity<?> authenticateUser(@Valid @RequestBody User loginRequest) {
@@ -63,7 +64,8 @@ public class AuthController {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 
                 String jwt = tokenProvider.generateToken(authentication);
-                AuthInfo auth = new AuthInfo((UserPrincipal) authentication.getPrincipal(), jwt, this.jwtExpirationInMs);
+                AuthInfo auth = new AuthInfo((UserPrincipal) authentication.getPrincipal(),
+                		jwt, Calendar.getInstance().getTimeInMillis() + this.jwtExpirationInMs);
                 return ResponseEntity.ok((auth));
         }
 	

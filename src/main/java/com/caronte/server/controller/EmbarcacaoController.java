@@ -65,11 +65,17 @@ public class EmbarcacaoController {
 		emb.setProprietario(p);
 		
 		Embarcacao nova = repository.save(emb);
-		emb.setCaminhoImagem(nova.getId() + "_foto." + FilenameUtils.getExtension(emb.getImagem().getOriginalFilename()));;
-		emb.setCaminhoDocumento(nova.getId() + "_documento." + FilenameUtils.getExtension(emb.getDocumento().getOriginalFilename()));;
+		emb.setCaminhoImagem(nova.getId() + "_foto." + FilenameUtils.getExtension(emb.getImagem().getOriginalFilename()));
+		emb.setCaminhoDocumento(nova.getId() + "_documento." + FilenameUtils.getExtension(emb.getDocumento().getOriginalFilename()));
+		
+		emb.setCaminhoDocumentoPng(emb.getCaminhoDocumento());
 		 try {
 		        fileSaveService.save(emb.getImagem(), emb.getCaminhoImagem());	
 		        fileSaveService.save(emb.getDocumento(), emb.getCaminhoDocumento());
+		        if(FilenameUtils.getExtension(emb.getDocumento().getOriginalFilename()).equalsIgnoreCase("pdf")) {
+		        		emb.setCaminhoDocumentoPng(nova.getId() + "_documento." +  "png");
+		        		fileSaveService.createImageFromPdf(emb.getCaminhoDocumento());
+		        }
 		        repository.save(emb);
 		    } catch (IOException e) {
 		    	System.out.println(e);

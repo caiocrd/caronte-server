@@ -21,7 +21,9 @@ public class Proprietario {
 	
 	private String nome;
 	private String caminhoHabilitacao;
+	private String caminhoHabilitacaoPng;
 	private String caminhoDocumento;
+	private String caminhoDocumentoPng;
 	
 	@NotNull
 	@Transient
@@ -94,6 +96,18 @@ public class Proprietario {
 
 	public void setDependentes(List<Dependente> dependentes) {
 		this.dependentes = dependentes;
+	}
+	public String getCaminhoHabilitacaoPng() {
+		return caminhoHabilitacaoPng;
+	}
+	public void setCaminhoHabilitacaoPng(String caminhoHabilitacaoPng) {
+		this.caminhoHabilitacaoPng = caminhoHabilitacaoPng;
+	}
+	public String getCaminhoDocumentoPng() {
+		return caminhoDocumentoPng;
+	}
+	public void setCaminhoDocumentoPng(String caminhoDocumentoPng) {
+		this.caminhoDocumentoPng = caminhoDocumentoPng;
 	}
 	
 	
