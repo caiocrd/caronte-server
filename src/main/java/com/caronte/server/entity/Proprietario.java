@@ -25,10 +25,9 @@ public class Proprietario {
 	private String caminhoDocumento;
 	private String caminhoDocumentoPng;
 	
-	@NotNull
 	@Transient
 	private MultipartFile habilitacao;
-	@NotNull
+
 	@Transient
 	private MultipartFile documento;
 	

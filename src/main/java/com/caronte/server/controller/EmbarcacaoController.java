@@ -65,24 +65,27 @@ public class EmbarcacaoController {
 		emb.setProprietario(p);
 		
 		Embarcacao nova = repository.save(emb);
-		emb.setCaminhoImagem(nova.getId() + "_foto." + FilenameUtils.getExtension(emb.getImagem().getOriginalFilename()));
-		emb.setCaminhoDocumento(nova.getId() + "_documento." + FilenameUtils.getExtension(emb.getDocumento().getOriginalFilename()));
-		
-		emb.setCaminhoDocumentoPng(emb.getCaminhoDocumento());
-		 try {
-		        fileSaveService.save(emb.getImagem(), emb.getCaminhoImagem());	
-		        fileSaveService.save(emb.getDocumento(), emb.getCaminhoDocumento());
-		        if(FilenameUtils.getExtension(emb.getDocumento().getOriginalFilename()).equalsIgnoreCase("pdf")) {
-		        		emb.setCaminhoDocumentoPng(nova.getId() + "_documento." +  "png");
-		        		fileSaveService.createImageFromPdf(emb.getCaminhoDocumento());
-		        }
+		try {
+			if(emb.getDocumento() != null) {
+				emb.setCaminhoDocumento(nova.getId() + "_documento." + FilenameUtils.getExtension(emb.getDocumento().getOriginalFilename()));
+				emb.setCaminhoDocumentoPng(emb.getCaminhoDocumento());
+				fileSaveService.save(emb.getDocumento(), emb.getCaminhoDocumento());
+				if(FilenameUtils.getExtension(emb.getDocumento().getOriginalFilename()).equalsIgnoreCase("pdf")) {
+					emb.setCaminhoDocumentoPng(nova.getId() + "_documento." +  "png");
+					fileSaveService.createImageFromPdf(emb.getCaminhoDocumento());
+				}
+			}
+			if(emb.getImagem() != null) {
+				emb.setCaminhoImagem(nova.getId() + "_foto." + FilenameUtils.getExtension(emb.getImagem().getOriginalFilename()));
+				fileSaveService.save(emb.getImagem(), emb.getCaminhoImagem());	
+			}
 		        repository.save(emb);
-		    } catch (IOException e) {
-		    	System.out.println(e);
-		    		return ResponseEntity.badRequest().body(null);
-		    }
-		 URI uri = uriBuilder.path("/embarcacoes/{id}").buildAndExpand(nova.getId()).toUri();
-		 return ResponseEntity.created(uri).body(nova);
+	    } catch (IOException e) {
+	    	System.out.println(e);
+	    		return ResponseEntity.badRequest().body(null);
+	    }
+		URI uri = uriBuilder.path("/embarcacoes/{id}").buildAndExpand(nova.getId()).toUri();
+		return ResponseEntity.created(uri).body(nova);
 
 	}
 	
@@ -131,7 +134,12 @@ public class EmbarcacaoController {
 			try {
 				if(newEmbarcacao.getDocumento() != null){
 					embarcacao.setCaminhoDocumento(embarcacao.getId() + "_documento." + FilenameUtils.getExtension(newEmbarcacao.getDocumento().getOriginalFilename()));;
+					embarcacao.setCaminhoDocumentoPng(embarcacao.getCaminhoDocumento());
 					fileSaveService.save(newEmbarcacao.getDocumento(), embarcacao.getCaminhoDocumento());	
+					if(FilenameUtils.getExtension(newEmbarcacao.getDocumento().getOriginalFilename()).equalsIgnoreCase("pdf")) {
+						fileSaveService.createImageFromPdf(embarcacao.getCaminhoDocumento());
+						embarcacao.setCaminhoDocumentoPng(embarcacao.getId() + "_documento.png");
+					}
 				}
 				if(newEmbarcacao.getImagem() != null){
 					embarcacao.setCaminhoImagem(embarcacao.getId() + "_foto." + FilenameUtils.getExtension(newEmbarcacao.getImagem().getOriginalFilename()));;
@@ -154,9 +162,12 @@ public class EmbarcacaoController {
 		try {
 			fileSaveService.remove(embarcacao.getCaminhoDocumento());
 			fileSaveService.remove(embarcacao.getCaminhoImagem());
+			if(!embarcacao.getCaminhoDocumento().equals(embarcacao.getCaminhoDocumentoPng())) {
+				fileSaveService.remove(embarcacao.getCaminhoDocumentoPng());
+			}
 
 		} catch (IOException e) {
-			return ResponseEntity.badRequest().body(null);
+			System.out.println("NO IMAGE TO DELETE");
 		}
 		repository.deleteById(id);
 		return ResponseEntity.ok().build();

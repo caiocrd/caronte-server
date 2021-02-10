@@ -58,24 +58,28 @@ public class ProprietarioController {
 	@PostMapping
 	ResponseEntity<?> newProprieteario(@ModelAttribute Proprietario proprietario) {
 		Proprietario nova = repository.save(proprietario);
-		String extensaoHabilitacao = FilenameUtils.getExtension(proprietario.getHabilitacao().getOriginalFilename());
-		String extensaoDocumento = FilenameUtils.getExtension(proprietario.getDocumento().getOriginalFilename());
-		proprietario.setCaminhoHabilitacao(nova.getId() + "_habilitacao." + extensaoHabilitacao);
-		proprietario.setCaminhoDocumento(nova.getId() + "_documento_proprietario." + extensaoDocumento);
-		proprietario.setCaminhoDocumentoPng(proprietario.getCaminhoDocumento());
-		proprietario.setCaminhoHabilitacaoPng(proprietario.getCaminhoHabilitacaoPng());
 		
 		 try {
-	        fileSaveService.save(nova.getDocumento(), proprietario.getCaminhoDocumento());	
-	        fileSaveService.save(nova.getHabilitacao(), proprietario.getCaminhoHabilitacao());
-	        if(extensaoDocumento.equalsIgnoreCase("pdf")) {
-	        		fileSaveService.createImageFromPdf(proprietario.getCaminhoDocumento());
-	        		proprietario.setCaminhoDocumentoPng(nova.getId() + "_documento_proprietario.png");
-	        }
-	        if(extensaoHabilitacao.equalsIgnoreCase("pdf")) {
-	        		fileSaveService.createImageFromPdf(proprietario.getCaminhoHabilitacao());
-	        		proprietario.setCaminhoHabilitacaoPng(nova.getId() + "_habilitacao.png");
-	        }
+			if(proprietario.getDocumento() != null) {
+				String extensaoDocumento = FilenameUtils.getExtension(proprietario.getDocumento().getOriginalFilename());
+				proprietario.setCaminhoDocumento(nova.getId() + "_documento_proprietario." + extensaoDocumento);
+				proprietario.setCaminhoDocumentoPng(proprietario.getCaminhoDocumento());
+				fileSaveService.save(nova.getDocumento(), proprietario.getCaminhoDocumento());	
+				if(extensaoDocumento.equalsIgnoreCase("pdf")) {
+					fileSaveService.createImageFromPdf(proprietario.getCaminhoDocumento());
+					proprietario.setCaminhoDocumentoPng(nova.getId() + "_documento_proprietario.png");
+				}	
+			}
+			if(proprietario.getHabilitacao() != null) {
+				String extensaoHabilitacao = FilenameUtils.getExtension(proprietario.getHabilitacao().getOriginalFilename());
+				proprietario.setCaminhoHabilitacao(nova.getId() + "_habilitacao." + extensaoHabilitacao);
+				proprietario.setCaminhoHabilitacaoPng(proprietario.getCaminhoHabilitacaoPng());
+				fileSaveService.save(nova.getHabilitacao(), proprietario.getCaminhoHabilitacao());
+				if(extensaoHabilitacao.equalsIgnoreCase("pdf")) {
+					fileSaveService.createImageFromPdf(proprietario.getCaminhoHabilitacao());
+					proprietario.setCaminhoHabilitacaoPng(nova.getId() + "_habilitacao.png");
+				}
+			}
 	        repository.save(proprietario);
 	    } catch (IOException e) {
 	    	System.out.println(e);

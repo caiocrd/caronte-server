@@ -25,11 +25,9 @@ public class Embarcacao {
 	private String nome;
 	private String descricao;
 	
-	@NotNull
 	@Transient
 	private MultipartFile imagem;
 	
-	@NotNull
 	@Transient
 	private MultipartFile documento;
 	
