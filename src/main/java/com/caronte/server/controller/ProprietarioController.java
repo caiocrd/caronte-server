@@ -47,12 +47,9 @@ public class ProprietarioController {
 	}
 	@CrossOrigin
 	@GetMapping
-	List<Proprietario> all(@RequestParam(required = false) String nome) {
-		ExampleMatcher customExampleMatcher = ExampleMatcher.matchingAny()
-			      .withMatcher("nome", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
-		Proprietario emb = new Proprietario(nome);
-	    Example<Proprietario> examples = Example.of(emb, customExampleMatcher);
-		return repository.findAll(examples);
+	List<Proprietario> all(@RequestParam(required = false, defaultValue = "") String nome) {
+		
+		return repository.findByNomeContainingIgnoreCaseOrderByNomeAsc(nome);
 	}
 	@CrossOrigin
 	@PostMapping
@@ -105,8 +102,6 @@ public class ProprietarioController {
 				System.out.println(e);
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
-		}else { 
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		URI uri = uriBuilder.path("/embarcacoes/{id}/movimentacoes").buildAndExpand(dependente.getId()).toUri();
 		return ResponseEntity.created(uri).body(novo);

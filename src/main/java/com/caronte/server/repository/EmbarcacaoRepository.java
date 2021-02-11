@@ -8,5 +8,5 @@ import com.caronte.server.entity.Embarcacao;
 
 public interface EmbarcacaoRepository extends JpaRepository<Embarcacao, Long>{
 
-	public List<Embarcacao> findByNomeContainingIgnoreCase(String nome);
+	public List<Embarcacao> findByNomeContainingIgnoreCaseOrderByNomeAsc(String nome);
 }

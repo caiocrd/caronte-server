@@ -24,11 +24,15 @@ public class ImagemController {
 	private String IMAGEM_DIR;
 	
 	@GetMapping(value = "/imagem")
-	public @ResponseBody void getImageWithMediaType(HttpServletResponse response, @RequestParam(required = false) String caminho) throws IOException {
-		File file = new File(IMAGEM_DIR+"/"+caminho);
-	    InputStream in = new FileInputStream(file);
-	    response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-	    IOUtils.copy(in, response.getOutputStream());
+	public @ResponseBody void getImageWithMediaType(HttpServletResponse response, @RequestParam(required = false) String caminho)  {
+		try {
+			File file = new File(IMAGEM_DIR+"/"+caminho);
+		    InputStream in = new FileInputStream(file);
+		    response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+		    IOUtils.copy(in, response.getOutputStream());
+		} catch (Exception e) {
+			System.out.println("Iagem nao encontrada");
+		}
 	}
 
 	

@@ -44,7 +44,7 @@ public class DependenteController {
 			fileSaveService.remove(dependente.getCaminhoHabilitacao());
 
 		} catch (IOException e) {
-			return ResponseEntity.badRequest().body(null);
+			System.out.println("Nao conseguiu deletar os arquivos");
 		}
 		repository.deleteById(id);
 		return ResponseEntity.ok().build();

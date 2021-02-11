@@ -52,7 +52,7 @@ public class EmbarcacaoController {
 	@GetMapping
 	List<Embarcacao> all(@RequestParam(required = false, defaultValue = "") String nome) {
 		
-		return repository.findByNomeContainingIgnoreCase(nome);
+		return repository.findByNomeContainingIgnoreCaseOrderByNomeAsc(nome);
 	}
 	
 	@CrossOrigin
