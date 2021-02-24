@@ -86,8 +86,9 @@ public class UserController {
 			user.setEmail(newUser.getEmail());
 			Role userRole = roleRepository.findByName(newUser.getRoleName())
 					.orElseThrow(() -> new AppException("User Role not set."));
-
-			user.setRoles(Collections.singleton(userRole));
+			Role oldRole = user.getRoles().iterator().next();
+			user.getRoles().remove(oldRole);
+			user.getRoles().add(userRole);
 			
 			if(newUser.getPassword() != null && !newUser.getPassword().isEmpty())
 				user.setPassword(passwordEncoder.encode(newUser.getPassword()));

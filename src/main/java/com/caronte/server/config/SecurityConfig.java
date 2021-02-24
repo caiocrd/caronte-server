@@ -83,7 +83,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .antMatchers(HttpMethod.PUT).hasAnyAuthority("ROLE_ADMIN")
                         .antMatchers(HttpMethod.DELETE).hasAnyAuthority("ROLE_ADMIN")
                         .antMatchers("/users/**").hasAnyAuthority("ROLE_ADMIN")
-                        .antMatchers("/users/**").hasAnyAuthority("ROLE_ADMIN")
                     .anyRequest().authenticated();
         http.headers().frameOptions().disable();
 
