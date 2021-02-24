@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 
+import com.caronte.server.entity.Role;
+import com.caronte.server.entity.RoleName;
 import com.caronte.server.security.CustomUserDetailsService;
 import com.caronte.server.security.JwtAuthenticationEntryPoint;
 import com.caronte.server.security.JwtAuthenticationFilter;
@@ -73,24 +75,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                 .authorizeRequests()
-                    .antMatchers("/",
-                        "/favicon.ico",
-                        "/**/*.png",
-                        "/**/*.gif",
-                        "/**/*.svg",
-                        "/**/*.jpg",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js")
-                        .permitAll()
                     .antMatchers("/auth/**").permitAll()
                     .antMatchers("/recursos/**").permitAll()
-                    .antMatchers("/user/checkUsernameAvailability", "/user/checkEmailAvailability")
+                    .antMatchers(HttpMethod.GET, "/api/polls/**")
                         .permitAll()
-                    .antMatchers(HttpMethod.GET, "/api/polls/**", "/api/users/**")
-                        .permitAll()
-                    .anyRequest()
-                        .authenticated();
+                        .antMatchers(HttpMethod.POST).hasAnyAuthority("ROLE_ADMIN")
+                        .antMatchers(HttpMethod.PUT).hasAnyAuthority("ROLE_ADMIN")
+                        .antMatchers(HttpMethod.DELETE).hasAnyAuthority("ROLE_ADMIN")
+                        .antMatchers("/users/**").hasAnyAuthority("ROLE_ADMIN")
+                        .antMatchers("/users/**").hasAnyAuthority("ROLE_ADMIN")
+                    .anyRequest().authenticated();
         http.headers().frameOptions().disable();
 
         // Add our custom JWT security filter

@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.caronte.server.controller.dto.UserDTO;
 import com.caronte.server.entity.Role;
-import com.caronte.server.entity.RoleName;
 import com.caronte.server.entity.User;
 import com.caronte.server.exception.AppException;
 import com.caronte.server.repository.RoleRepository;
@@ -47,11 +47,14 @@ public class UserController {
 	
 	@CrossOrigin
 	@PostMapping
-	ResponseEntity<?> newUser( @RequestBody User user, UriComponentsBuilder uriBuilder) {
-		
-		user.setPassword(passwordEncoder.encode(user.getPassword()));
+	ResponseEntity<?> newUser( @RequestBody UserDTO userDTO, UriComponentsBuilder uriBuilder) {
+		User user = new User();
+		user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+		user.setEmail(userDTO.getEmail());
+		user.setName(userDTO.getName());
+		user.setUsername(userDTO.getUsername());
 
-		Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+		Role userRole = roleRepository.findByName(userDTO.getRoleName())
 						.orElseThrow(() -> new AppException("User Role not set."));
 
 		user.setRoles(Collections.singleton(userRole));
@@ -73,7 +76,7 @@ public class UserController {
 	}
 	@CrossOrigin
 	@PutMapping("/{id}")
-	ResponseEntity<?> replaceUser(@RequestBody User newUser, @PathVariable Long id, UriComponentsBuilder uriBuilder) {
+	ResponseEntity<?> replaceUser(@RequestBody UserDTO newUser, @PathVariable Long id, UriComponentsBuilder uriBuilder) {
 		
 		Optional<User> userOptional = repository.findById(id);
 		User user = new User();
@@ -81,6 +84,11 @@ public class UserController {
 			user = userOptional.get();
 			user.setName(newUser.getName());
 			user.setEmail(newUser.getEmail());
+			Role userRole = roleRepository.findByName(newUser.getRoleName())
+					.orElseThrow(() -> new AppException("User Role not set."));
+
+			user.setRoles(Collections.singleton(userRole));
+			
 			if(newUser.getPassword() != null && !newUser.getPassword().isEmpty())
 				user.setPassword(passwordEncoder.encode(newUser.getPassword()));
 			user.setUsername(newUser.getUsername());
