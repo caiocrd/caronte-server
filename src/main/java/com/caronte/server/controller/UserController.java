@@ -1,7 +1,6 @@
 package com.caronte.server.controller;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +25,7 @@ import com.caronte.server.entity.User;
 import com.caronte.server.exception.AppException;
 import com.caronte.server.repository.RoleRepository;
 import com.caronte.server.repository.UserRepository;
+import com.caronte.server.service.UserService;
 
 @RestController	
 @RequestMapping("users")
@@ -38,6 +38,10 @@ public class UserController {
 
 	@Autowired
 	PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private UserService userService;
+	
 	@CrossOrigin
 	@GetMapping
 	List<User> all(@RequestParam(required = false, defaultValue = "") String nome) {
@@ -48,18 +52,8 @@ public class UserController {
 	@CrossOrigin
 	@PostMapping
 	ResponseEntity<?> newUser( @RequestBody UserDTO userDTO, UriComponentsBuilder uriBuilder) {
-		User user = new User();
-		user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-		user.setEmail(userDTO.getEmail());
-		user.setName(userDTO.getName());
-		user.setUsername(userDTO.getUsername());
-
-		Role userRole = roleRepository.findByName(userDTO.getRoleName())
-						.orElseThrow(() -> new AppException("User Role not set."));
-
-		user.setRoles(Collections.singleton(userRole));
 		
-		User nova = repository.save(user);
+		User nova = this.userService.createUser(userDTO);
 		
 		URI uri = uriBuilder.path("/users/{id}").buildAndExpand(nova.getId()).toUri();
 		return ResponseEntity.created(uri).body(nova);

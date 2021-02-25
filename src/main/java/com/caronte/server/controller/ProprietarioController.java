@@ -7,10 +7,10 @@ import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,10 +25,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.caronte.server.entity.Dependente;
 import com.caronte.server.entity.Proprietario;
+import com.caronte.server.entity.User;
 import com.caronte.server.exception.ProprietarioNotFoundExceprion;
 import com.caronte.server.repository.DependenteRepository;
 import com.caronte.server.repository.ProprietarioRepository;
 import com.caronte.server.service.FileSaveService;
+import com.caronte.server.service.UserService;
 
 @RestController	
 @RequestMapping(value = "/proprietarios")
@@ -41,6 +43,9 @@ public class ProprietarioController {
 
 	@Autowired
 	private FileSaveService fileSaveService;
+	
+	@Autowired
+	private UserService userService;
 
 	public ProprietarioController(ProprietarioRepository repository) {
 		this.repository = repository;
@@ -54,6 +59,10 @@ public class ProprietarioController {
 	@CrossOrigin
 	@PostMapping
 	ResponseEntity<?> newProprieteario(@ModelAttribute Proprietario proprietario) {
+		
+		proprietario.getUser().setName(proprietario.getNome());
+		proprietario.getUser().setUsername(proprietario.getUser().getEmail());
+		proprietario.setUser(this.userService.createProprietarioUser(proprietario.getUser()));
 		Proprietario nova = repository.save(proprietario);
 		
 		 try {
@@ -115,6 +124,23 @@ public class ProprietarioController {
 		retorno.getEmbarcacoes().size();
 		return retorno;
 	}
+	
+	@CrossOrigin
+	@GetMapping("/me")
+	Proprietario perfil() {
+		
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String username = "";
+		if (principal instanceof UserDetails) {
+		   username = ((UserDetails)principal).getUsername();
+		} else {
+		   username = principal.toString();
+		}
+		Proprietario retorno = repository.findByUserUsername(username).orElseThrow(() -> new ProprietarioNotFoundExceprion(0l));
+		retorno.getEmbarcacoes().size();
+		return retorno;
+	}
+	
 	@CrossOrigin
 	@PutMapping("/{id}")
 	ResponseEntity<?> replaceProprietario(@ModelAttribute Proprietario newProprietario, @PathVariable Long id, UriComponentsBuilder uriBuilder) {

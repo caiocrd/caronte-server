@@ -15,10 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 
-import com.caronte.server.entity.Role;
-import com.caronte.server.entity.RoleName;
 import com.caronte.server.security.CustomUserDetailsService;
 import com.caronte.server.security.JwtAuthenticationEntryPoint;
 import com.caronte.server.security.JwtAuthenticationFilter;

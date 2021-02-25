@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +36,9 @@ public class Proprietario {
 	
 	@OneToMany(mappedBy = "titular", cascade = CascadeType.ALL)
 	private List<Dependente> dependentes;
+	
+	@OneToOne(cascade = CascadeType.REMOVE)
+	private User user;
 
 	public Proprietario() {
 		// TODO Auto-generated constructor stub
@@ -106,6 +110,12 @@ public class Proprietario {
 	}
 	public void setCaminhoDocumentoPng(String caminhoDocumentoPng) {
 		this.caminhoDocumentoPng = caminhoDocumentoPng;
+	}
+	public User getUser() {
+		return user;
+	}
+	public void setUser(User user) {
+		this.user = user;
 	}
 	
 	
